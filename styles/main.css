@@ -1,0 +1,15 @@
+.movies-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 20px;
+    width: 10%;
+}
+
+.movie {
+    width: 50px;
+}
+
+.movie img {
+    width: 100%;
+    height: auto;
+}
