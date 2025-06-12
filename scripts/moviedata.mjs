@@ -38,17 +38,13 @@ export default class MovieData {
         console.log('Movie ID:', movieId);
 
         try {
-            // Fetch movie details from TMDb
             const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKeyTmdb}`);
             const movie = await response.json();
 
-            // Fetch trailer
             const trailerId = await this.fetchYouTubeTrailer(movieTitle + " trailer");
 
-            // Fetch streaming availability using Watchmode
             const platforms = await this.fetchStreamingAvailabilityFromWatchmode(movieTitle, movieId);
 
-            // Build streaming availability HTML
             let platformHTML = '<p><strong>Available On:</strong><br>';
             if (platforms) {
                 for (const [name, available] of Object.entries(platforms)) {
@@ -59,7 +55,6 @@ export default class MovieData {
             }
             platformHTML += '</p>';
 
-            // Build modal
             let modal = document.getElementById('movieModal');
             let modalContent = document.getElementById('modalContent');
 
@@ -94,7 +89,6 @@ export default class MovieData {
                 modal.appendChild(modalContent);
             }
 
-            // Fill modal content
             modalContent.innerHTML = `
             <span id="closeModal" style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer;">&times;</span>
             <h2>${movie.title}</h2>
@@ -114,7 +108,6 @@ export default class MovieData {
             ${platformHTML}
         `;
 
-            // Modal close behavior
             document.getElementById('closeModal').onclick = () => {
                 modal.style.display = 'none';
             };
@@ -151,7 +144,6 @@ export default class MovieData {
 
     async fetchStreamingAvailabilityFromWatchmode(movieTitle, tmdbId) {
         try {
-            // Step 1: Get Watchmode ID from TMDb ID
             const searchUrl = `https://api.watchmode.com/v1/search/?apiKey=${apiKeyWatchmode}&search_field=tmdb_movie_id&search_value=${tmdbId}`;
 
             const searchResponse = await fetch(searchUrl);
@@ -163,7 +155,6 @@ export default class MovieData {
 
             const watchmodeId = searchData.title_results[0].id;
 
-            // Step 2: Get sources
             const sourcesUrl = `https://api.watchmode.com/v1/title/${watchmodeId}/sources/?apiKey=${apiKeyWatchmode}`;
             const sourcesResponse = await fetch(sourcesUrl);
             const sources = await sourcesResponse.json();
