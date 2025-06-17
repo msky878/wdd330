@@ -29,9 +29,18 @@
 
     </header>
     <main>
-        <h1>Trending Movies</h1>
-        <div class="movies-grid" id="trending-movies"></div>
-        <btn id="load-more-btn">More</btn>
+        <!-- Watch Later Button -->
+        <button id="watchLaterBtn">📺 Watch Later</button>
+        <button id="backToTrendingBtn" style="display:none;">⬅️ Back to Trending</button>
+
+        <!-- Trending Movies -->
+        <div id="trending-movies" class="movie-grid"></div>
+        <button id="load-more-btn">Load More</button>
+        <button id="randomMovieBtn">🎲 Surprise Me</button>
+
+        <!-- Watch Later List -->
+        <div id="watch-later-container" style="display: none;"></div>
+
     </main>
     <footer>
 

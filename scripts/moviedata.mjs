@@ -89,24 +89,51 @@ export default class MovieData {
                 modal.appendChild(modalContent);
             }
 
+            // Check if movie already in list
+            const watchLaterList = JSON.parse(localStorage.getItem('watchLaterList')) || [];
+            const isAlreadyInList = watchLaterList.some(item => item.id === movie.id);
+
+
             modalContent.innerHTML = `
-            <span id="closeModal" style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer;">&times;</span>
-            <h2>${movie.title}</h2>
-            <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" style="width: 100%; border-radius: 8px;" />
-            <p><strong>Release Date:</strong> ${movie.release_date}</p>
-            <p><strong>Rating:</strong> ${movie.vote_average}</p>
-            <p>${movie.overview}</p>
-            ${trailerId ? `
-                <div style="margin-top: 20px">
-                    <iframe width="100%" height="315"
-                        src="https://www.youtube.com/embed/${trailerId}"
-                        frameborder="0"
-                        allowfullscreen>
-                    </iframe>
-                </div>
-            ` : '<p><em>No trailer found.</em></p>'}
-            ${platformHTML}
-        `;
+    <span id="closeModal" style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer;">&times;</span>
+    <h2>${movie.title}</h2>
+    <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" style="width: 100%; border-radius: 8px;" />
+    <p><strong>Release Date:</strong> ${movie.release_date}</p>
+    <p><strong>Rating:</strong> ${movie.vote_average}</p>
+    <p>${movie.overview}</p>
+    ${trailerId ? `
+        <div style="margin-top: 20px">
+            <iframe width="100%" height="315"
+                src="https://www.youtube.com/embed/${trailerId}"
+                frameborder="0"
+                allowfullscreen>
+            </iframe>
+        </div>
+    ` : '<p><em>No trailer found.</em></p>'}
+    ${platformHTML}
+    <div style="text-align: center; margin-top: 15px;">
+        <button id="addToWatchLaterBtn" style="padding: 10px 20px; font-size: 1rem; cursor: pointer;" ${isAlreadyInList ? 'disabled' : ''}>
+            📺 ${isAlreadyInList ? 'Already in Watch Later' : 'Add to Watch Later'}
+        </button>
+    </div>
+`;
+
+            const addBtn = document.getElementById('addToWatchLaterBtn');
+            if (addBtn && !isAlreadyInList) {
+                addBtn.addEventListener('click', () => {
+                    const updatedList = [...watchLaterList, {
+                        id: movie.id,
+                        title: movie.title,
+                        poster_path: movie.poster_path
+                    }];
+                    localStorage.setItem('watchLaterList', JSON.stringify(updatedList));
+                    this.showNotification(`${movie.title} added to your Watch Later list!`);
+
+                    addBtn.textContent = '📺 Already in Watch Later';
+                    addBtn.disabled = true;
+                });
+            }
+
 
             document.getElementById('closeModal').onclick = () => {
                 modal.style.display = 'none';
@@ -149,8 +176,6 @@ export default class MovieData {
             const searchResponse = await fetch(searchUrl);
             const searchData = await searchResponse.json();
 
-            console.log('Search results from Watchmode:', searchData);
-
             if (!searchData.title_results || searchData.title_results.length === 0) return null;
 
             const watchmodeId = searchData.title_results[0].id;
@@ -158,9 +183,6 @@ export default class MovieData {
             const sourcesUrl = `https://api.watchmode.com/v1/title/${watchmodeId}/sources/?apiKey=${apiKeyWatchmode}`;
             const sourcesResponse = await fetch(sourcesUrl);
             const sources = await sourcesResponse.json();
-
-            console.log('Sources from Watchmode:', sources);
-
 
             const services = {
                 'Netflix': false,
@@ -184,4 +206,65 @@ export default class MovieData {
             return null;
         }
     }
+
+    async showRandomTrendingMovie() {
+        try {
+            const response = await fetch(`https://api.themoviedb.org/3/trending/movie/day?api_key=${apiKeyTmdb}`);
+            const data = await response.json();
+
+            const movies = data.results;
+            if (!movies || movies.length === 0) {
+                console.warn("No movies found in trending list.");
+                return;
+            }
+
+            const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+
+            // Call your existing showMovieDetails method
+            this.showMovieDetails(randomMovie.id, randomMovie.title);
+
+        } catch (error) {
+            console.error("Error fetching trending movies for random selection:", error);
+        }
+    }
+
+    showNotification(message, duration = 3000) {
+        const existing = document.getElementById('custom-notification');
+        if (existing) existing.remove();
+
+        const notif = document.createElement('div');
+        notif.id = 'custom-notification';
+        notif.textContent = message;
+        notif.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #323232;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        font-size: 1rem;
+        z-index: 10000;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    `;
+        document.body.appendChild(notif);
+
+        // Trigger animation
+        requestAnimationFrame(() => {
+            notif.style.opacity = '1';
+            notif.style.transform = 'translateY(0)';
+        });
+
+        // Remove after duration
+        setTimeout(() => {
+            notif.style.opacity = '0';
+            notif.style.transform = 'translateY(20px)';
+            setTimeout(() => notif.remove(), 300);
+        }, duration);
+    }
+
+
 }
