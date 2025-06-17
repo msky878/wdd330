@@ -48,7 +48,7 @@ export default class WatchLater {
         const unseen = this.getList(this.watchLaterKey);
         const seen = this.getList(this.seenKey);
 
-        const createSection = (title, movies, seenSection = false) => {
+        const createSection = (title, movies, seenSection) => {
             const section = document.createElement('div');
             section.innerHTML = `<h3>${title}</h3>`;
             const grid = document.createElement('div');
@@ -56,13 +56,11 @@ export default class WatchLater {
 
             movies.forEach(movie => {
                 const movieEl = document.createElement('div');
-                movieEl.className = 'movie';
-
                 movieEl.innerHTML = `
-                    <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
-                    <div class="actions">
+                    <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" class="trending-img" alt="${movie.title}">
+                    <div class="button-group">
                         <button class="remove">❌</button>
-                        ${!seenSection ? '<button class="seen">✅</button>' : ''}
+                        ${!seenSection ? '<button class="seen seen-btn">✅</button>' : ''}
                     </div>
                 `;
 
@@ -89,7 +87,7 @@ export default class WatchLater {
             this.container.appendChild(section);
         };
 
-        createSection('To Watch', unseen);
+        createSection('To Watch', unseen, false);
         createSection('Watched', seen, true);
     }
 }

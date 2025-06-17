@@ -15,10 +15,10 @@ export default class MovieData {
 
             movies.forEach(movie => {
                 const movieElement = document.createElement('div');
-                movieElement.classList.add('movie');
+                movieElement.classList.add('trending-card');
 
                 movieElement.innerHTML = `
-                    <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
+                    <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" class="trending-img" alt="${movie.title}">
                 `;
 
                 movieElement.querySelector('img').addEventListener('click', () => {
@@ -45,7 +45,7 @@ export default class MovieData {
 
             const platforms = await this.fetchStreamingAvailabilityFromWatchmode(movieTitle, movieId);
 
-            let platformHTML = '<p><strong>Available On:</strong><br>';
+            let platformHTML = '<p class="platforms"><strong>Available On:</strong><br>';
             if (platforms) {
                 for (const [name, available] of Object.entries(platforms)) {
                     platformHTML += `${available ? '✅' : '❌'} ${name}<br>`;
@@ -61,58 +61,52 @@ export default class MovieData {
             if (!modal) {
                 modal = document.createElement('div');
                 modal.id = 'movieModal';
-                modal.classList.add('modal');
-                modal.style.cssText = `
-                position: fixed;
-                top: 0; left: 0;
-                width: 100%; height: 100%;
-                background: rgba(0, 0, 0, 0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 999;
-            `;
                 document.body.appendChild(modal);
 
                 modalContent = document.createElement('div');
                 modalContent.id = 'modalContent';
-                modalContent.style.cssText = `
-                background: #fff;
-                padding: 20px;
-                width: 90%;
-                max-width: 600px;
-                border-radius: 10px;
-                position: relative;
-                overflow-y: auto;
-                max-height: 90%;
-            `;
                 modal.appendChild(modalContent);
             }
 
-            // Check if movie already in list
             const watchLaterList = JSON.parse(localStorage.getItem('watchLaterList')) || [];
             const isAlreadyInList = watchLaterList.some(item => item.id === movie.id);
 
 
             modalContent.innerHTML = `
-    <span id="closeModal" style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer;">&times;</span>
-    <h2>${movie.title}</h2>
-    <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" style="width: 100%; border-radius: 8px;" />
-    <p><strong>Release Date:</strong> ${movie.release_date}</p>
-    <p><strong>Rating:</strong> ${movie.vote_average}</p>
-    <p>${movie.overview}</p>
+    <span id="closeModal">&times;</span>
+    
+    <h2 style="font-size: 2rem; margin-bottom: 20px; text-align: center;">
+        ${movie.title}
+    </h2>
+    
+    <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" 
+             alt="${movie.title}" 
+             style="width: 250px; border-radius: 8px;" />
+             
+        <div style="flex: 1;">
+            <p style="margin-top: 0;">${movie.overview}</p>
+        </div>
+    </div>
+
     ${trailerId ? `
-        <div style="margin-top: 20px">
+        <div style="margin-top: 30px;">
             <iframe width="100%" height="315"
                 src="https://www.youtube.com/embed/${trailerId}"
                 frameborder="0"
                 allowfullscreen>
             </iframe>
         </div>
-    ` : '<p><em>No trailer found.</em></p>'}
-    ${platformHTML}
-    <div style="text-align: center; margin-top: 15px;">
-        <button id="addToWatchLaterBtn" style="padding: 10px 20px; font-size: 1rem; cursor: pointer;" ${isAlreadyInList ? 'disabled' : ''}>
+    ` : '<p style="margin-top: 30px;"><b>No trailer found.</b></p>'}
+
+    <div style="margin-top: 20px;">
+        <p><strong>Release Date:</strong> ${movie.release_date}</p>
+        <p><strong>Rating:</strong> ${movie.vote_average}</p>
+        ${platformHTML}
+    </div>
+
+    <div class="button-group" style="margin-top: 20px;">
+        <button id="addToWatchLaterBtn" ${isAlreadyInList ? 'disabled' : ''}>
             📺 ${isAlreadyInList ? 'Already in Watch Later' : 'Add to Watch Later'}
         </button>
     </div>
@@ -220,7 +214,6 @@ export default class MovieData {
 
             const randomMovie = movies[Math.floor(Math.random() * movies.length)];
 
-            // Call your existing showMovieDetails method
             this.showMovieDetails(randomMovie.id, randomMovie.title);
 
         } catch (error) {
@@ -235,30 +228,13 @@ export default class MovieData {
         const notif = document.createElement('div');
         notif.id = 'custom-notification';
         notif.textContent = message;
-        notif.style.cssText = `
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background: #323232;
-        color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        font-size: 1rem;
-        z-index: 10000;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.3s ease, transform 0.3s ease;
-    `;
         document.body.appendChild(notif);
 
-        // Trigger animation
         requestAnimationFrame(() => {
             notif.style.opacity = '1';
             notif.style.transform = 'translateY(0)';
         });
 
-        // Remove after duration
         setTimeout(() => {
             notif.style.opacity = '0';
             notif.style.transform = 'translateY(20px)';

@@ -26,24 +26,45 @@
 
 <body>
     <header>
-
+        <div id="header-logo">
+            <a href="index.html">
+                <img src="images/icon.png" alt="Movie Night Helper logo">
+            </a>
+            <a href="index.html">
+                <div>
+                    <h2>Movie Night Helper</h2>
+                    <h3>Your personal movie assistant</h3>
+                </div>
+            </a>
+        </div>
     </header>
     <main>
-        <!-- Watch Later Button -->
-        <button id="watchLaterBtn">📺 Watch Later</button>
-        <button id="backToTrendingBtn" style="display:none;">⬅️ Back to Trending</button>
+        <div class="button-group">
+            <button id="watchLaterBtn">📺 Watch Later</button>
+            <button id="backToTrendingBtn" style="display: none;">⬅️ Back to Trending</button>
+            <button id="randomMovieBtn">🎲 Surprise Me</button>
+        </div>
 
-        <!-- Trending Movies -->
-        <div id="trending-movies" class="movie-grid"></div>
-        <button id="load-more-btn">Load More</button>
-        <button id="randomMovieBtn">🎲 Surprise Me</button>
+        <div id="trending-movies"></div>
 
-        <!-- Watch Later List -->
+        <div class="button-group">
+            <button id="load-more-btn">Load More</button>
+        </div>
+
         <div id="watch-later-container" style="display: none;"></div>
 
     </main>
     <footer>
-
+        <div id="footer-text">
+            <h4>Movie Night Helper</h4>
+            <p>&#169;2025</p>
+        </div>
+        <div id="footer-social">
+            <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram logo/link"
+                    loading="lazy"></a>
+            <a href="https://facebook.com"><img src="images/facebook.png" alt="Facebook logo/link" loading="lazy"></a>
+            <a href="https://youtube.com"><img src="images/youtube.png" alt="YouTube logo/link" loading="lazy"></a>
+        </div>
     </footer>
 </body>
 
